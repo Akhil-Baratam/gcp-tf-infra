@@ -26,6 +26,10 @@ resource "google_container_cluster" "gke_cluster" {
 
   network    = data.terraform_remote_state.vpc.outputs.vpc_network_id
   subnetwork = data.terraform_remote_state.vpc.outputs.gke_subnet_id
+  
+  gateway_api_config {
+    channel = "CHANNEL_STANDARD"
+  }
 
   ip_allocation_policy {
     cluster_secondary_range_name  = "pods"
@@ -34,7 +38,7 @@ resource "google_container_cluster" "gke_cluster" {
 
   resource_labels = local.all_labels
   # Enable dataplane v2 (advanced CNI)
-  datapath_provider = "ADVANCED_DATAPATH"
+  # datapath_provider = "ADVANCED_DATAPATH"
   deletion_protection = false
 
   # Ignore changes to node_config because remove_default_node_pool deletes it, 
