@@ -1,0 +1,6 @@
+# Default values for gateway.
+gateway:
+  name: cinemates-gateway
+  namespace: default
+  className: gke-l7-gxlb # Global External HTTP Load Balancer
+  port: 80

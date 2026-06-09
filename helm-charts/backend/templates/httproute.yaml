@@ -1,0 +1,20 @@
+{{- if .Values.route.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+  - name: {{ .Values.route.parentRef.name }}
+    namespace: {{ .Values.route.parentRef.namespace }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    backendRefs:
+    - name: {{ include "backend.fullname" . }}
+      port: {{ (index .Values.service.ports 0).port }}
+{{- end }}

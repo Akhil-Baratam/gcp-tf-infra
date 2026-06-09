@@ -24,3 +24,9 @@ service:
       port: 80
       targetPort: http
       protocol: TCP
+
+route:
+  enabled: true
+  parentRef:
+    name: cinemates-gateway
+    namespace: default
