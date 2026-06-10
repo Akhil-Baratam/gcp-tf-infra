@@ -66,7 +66,7 @@ resource "google_container_cluster" "gke_cluster" {
 
   resource_labels = local.all_labels
   # Enable dataplane v2 (advanced CNI)
-  # datapath_provider = "ADVANCED_DATAPATH"
+  datapath_provider = "ADVANCED_DATAPATH"
   deletion_protection = false
 
   # Ignore changes to node_config because remove_default_node_pool deletes it, 
