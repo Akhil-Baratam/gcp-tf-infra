@@ -7,6 +7,18 @@ data "google_secret_manager_secret_version" "github_pat" {
   project = var.project_id
 }
 
+# Fetch Google OAuth Client ID from Google Secret Manager
+data "google_secret_manager_secret_version" "google_oauth_client_id" {
+  secret  = "GOOGLE_OAUTH_CLIENT_ID"
+  project = var.project_id
+}
+
+# Fetch Google OAuth Client Secret from Google Secret Manager
+data "google_secret_manager_secret_version" "google_oauth_client_secret" {
+  secret  = "GOOGLE_OAUTH_CLIENT_SECRET"
+  project = var.project_id
+}
+
 # Create Kubernetes secret for GitHub repository credentials
 resource "kubernetes_secret" "argocd_repo_creds" {
   metadata {
@@ -40,7 +52,10 @@ resource "helm_release" "argocd" {
   wait             = true
 
   values = [
-    file("${path.module}/charts/argocd/value.yaml")
+    templatefile("${path.module}/charts/argocd/value.yaml", {
+      google_oauth_client_id     = data.google_secret_manager_secret_version.google_oauth_client_id.secret_data
+      google_oauth_client_secret = data.google_secret_manager_secret_version.google_oauth_client_secret.secret_data
+    })
   ]
 
   depends_on = [
