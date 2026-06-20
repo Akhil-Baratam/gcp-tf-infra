@@ -20,6 +20,18 @@ resource "helm_release" "grafana" {
   ]
 }
 
+# Deploy HTTPRoute to expose Grafana UI on the Gateway Load Balancer
+
+resource "kubectl_manifest" "grafana_httproute" {
+
+  yaml_body = file("${path.module}/charts/grafana/httproute.yaml")
+
+  depends_on = [
+    helm_release.grafana
+  ]
+  
+}
+
 output "grafana_server_service" {
   description = "Grafana server service name"
   value       = "grafana"

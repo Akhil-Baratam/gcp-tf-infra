@@ -13,6 +13,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.17"
     }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "~> 1.14"
+    }
   }
 }
 
@@ -48,3 +52,11 @@ provider "helm" {
 }
 
 data "google_client_config" "default" {}
+
+# Configure kubectl provider using GKE cluster details
+provider "kubectl" {
+  host                   = "https://${data.terraform_remote_state.gke.outputs.cluster_endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.gke.outputs.cluster_ca_certificate)
+  load_config_file       = false
+}

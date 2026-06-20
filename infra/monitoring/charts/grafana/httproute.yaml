@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: grafana-route
+  namespace: monitoring
+spec:
+  parentRefs:
+  - name: cinemates-gateway
+    namespace: default
+  hostnames:
+  - "grafana.34.49.38.142.nip.io"
+  rules:
+  - backendRefs:
+    - name: kube-prometheus-stack-grafana
+      port: 80
