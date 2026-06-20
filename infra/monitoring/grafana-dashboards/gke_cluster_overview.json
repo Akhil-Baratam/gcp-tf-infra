@@ -1,0 +1,87 @@
+{
+  "title": "GKE Cluster Overview",
+  "uid": "gke-cluster-overview",
+  "tags": ["kubernetes", "gke"],
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1, "title": "Total Nodes", "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "count(kube_node_info)", "legendFormat": "Nodes" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" }
+    },
+    {
+      "id": 2, "title": "Running Pods", "type": "stat",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(kube_pod_status_phase{phase='Running'})", "legendFormat": "Running" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" } } }
+    },
+    {
+      "id": 3, "title": "Pending Pods", "type": "stat",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(kube_pod_status_phase{phase='Pending'})", "legendFormat": "Pending" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] }, "color": { "mode": "thresholds" } } }
+    },
+    {
+      "id": 4, "title": "Failed Pods", "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(kube_pod_status_phase{phase='Failed'})", "legendFormat": "Failed" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "red", "value": 1 }] }, "color": { "mode": "thresholds" } } }
+    },
+    {
+      "id": 5, "title": "Cluster CPU Usage %", "type": "stat",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(rate(container_cpu_usage_seconds_total{container!='',pod!=''}[5m])) / sum(kube_node_status_allocatable{resource='cpu'}) * 100", "legendFormat": "CPU %" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] }, "color": { "mode": "thresholds" } } }
+    },
+    {
+      "id": 6, "title": "Cluster Memory Usage %", "type": "stat",
+      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(container_memory_working_set_bytes{container!='',pod!=''}) / sum(kube_node_status_allocatable{resource='memory'}) * 100", "legendFormat": "Memory %" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] }, "color": { "mode": "thresholds" } } }
+    },
+    {
+      "id": 7, "title": "Cluster CPU Usage (Timeseries)", "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(rate(container_cpu_usage_seconds_total{container!='',pod!=''}[5m])) / sum(kube_node_status_allocatable{resource='cpu'}) * 100", "legendFormat": "CPU %" }],
+      "fieldConfig": { "defaults": { "unit": "percent", "max": 100 } }
+    },
+    {
+      "id": 8, "title": "Cluster Memory Usage (Timeseries)", "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum(container_memory_working_set_bytes{container!='',pod!=''}) / sum(kube_node_status_allocatable{resource='memory'}) * 100", "legendFormat": "Memory %" }],
+      "fieldConfig": { "defaults": { "unit": "percent", "max": 100 } }
+    },
+    {
+      "id": 9, "title": "Pod Restarts (Last 1h)", "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [{ "expr": "sum by (namespace, pod) (increase(kube_pod_container_status_restarts_total[1h])) > 0", "legendFormat": "{{namespace}}/{{pod}}" }],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "id": 10, "title": "Network I/O", "type": "timeseries",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(rate(container_network_receive_bytes_total{pod!=''}[5m]))", "legendFormat": "Received" },
+        { "expr": "sum(rate(container_network_transmit_bytes_total{pod!=''}[5m]))", "legendFormat": "Transmitted" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "Bps" } }
+    }
+  ]
+}

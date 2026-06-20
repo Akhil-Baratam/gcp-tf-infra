@@ -19,3 +19,9 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+# Grafana Folder
+variable "grafana_folders" {
+  description = "List of Grafana folders to create"
+  type        = list(string)
+}
