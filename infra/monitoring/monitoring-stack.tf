@@ -16,7 +16,7 @@ resource "helm_release" "prometheus" {
   namespace        = "monitoring"
   create_namespace = true
   timeout          = 600
-  wait             = false
+  wait             = true
 
   values = [
     templatefile("${path.module}/charts/prometheus/values-override.yaml", {

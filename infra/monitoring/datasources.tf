@@ -7,4 +7,6 @@ resource "grafana_data_source" "loki" {
   json_data_encoded = jsonencode({
     maxLines = 1000
   })
+
+  depends_on = [helm_release.prometheus]
 }

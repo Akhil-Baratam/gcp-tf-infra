@@ -29,7 +29,10 @@ alertmanager:
         memory: 256Mi
 
 grafana:
+  assertNoLeakedSecrets: false
   grafana.ini:
+    auth:
+      disable_login_form: true
     server:
       domain: "grafana.34.49.38.142.nip.io"
       root_url: "http://grafana.34.49.38.142.nip.io/"

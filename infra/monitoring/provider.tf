@@ -57,9 +57,14 @@ provider "helm" {
 
 data "google_client_config" "default" {}
 
-# Fetch Grafana auth token from GCP Secret Manager
-data "google_secret_manager_secret_version" "grafana_auth" {
-  secret = "GRAFANA_AUTH_TOKEN"
+# Read Grafana admin password from the secret created by the Helm chart.
+# This is always valid and survives pod restarts (unlike service account tokens,
+# which are stored in Grafana's DB and lost when persistence is disabled).
+data "kubernetes_secret" "grafana_admin" {
+  metadata {
+    name      = "kube-prometheus-stack-grafana"
+    namespace = "monitoring"
+  }
 }
 
 # Configure kubectl provider using GKE cluster details
@@ -72,5 +77,5 @@ provider "kubectl" {
 
 provider "grafana" {
   url  = "http://grafana.34.49.38.142.nip.io"
-  auth = data.google_secret_manager_secret_version.grafana_auth.secret_data
+  auth = "admin:${data.kubernetes_secret.grafana_admin.data["admin-password"]}"
 }

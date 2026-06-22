@@ -3,6 +3,8 @@
 resource "grafana_folder" "folders" {
   for_each = toset(var.grafana_folders)
   title    = each.value
+
+  depends_on = [helm_release.prometheus]
 }
 
 locals {
